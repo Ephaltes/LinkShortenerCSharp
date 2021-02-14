@@ -2,6 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
+using LinkShortener.Application.Interface;
+using LinkShortener.Application.PipelineBehavior;
+using LinkShortener.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,6 +36,15 @@ namespace LinkShortener
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "LinkShortener", Version = "v1"});
             });
+            
+            //custom
+            
+            services.AddSingleton<IRepository,Repository>();
+            
+            //CQRS Pattern + Mediator Pattern https://www.youtube.com/watch?v=YzOBrVlthMk&feature=youtu.be
+            services.AddMediatR(typeof(Startup));            
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

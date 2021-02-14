@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using LinkShortener.Application.Command;
+using LinkShortener.Application.Interface;
+using LinkShortener.Application.Query;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace LinkShortener.Controllers
@@ -8,20 +13,32 @@ namespace LinkShortener.Controllers
     public class LinkController : ControllerBase
     {
         private readonly ILogger<LinkController> _logger;
+        private readonly IRepository _db;
+        private readonly IMediator _mediator;
 
-        public LinkController(ILogger<LinkController> logger)
+        public LinkController(ILogger<LinkController> logger, IMediator mediator, IRepository db)
         {
             _logger = logger;
+            _mediator = mediator;
+            _db = db;
         }
 
         [HttpGet]
-        [Route("{sluge=}")]
-        public string Get(string sluge)
+        [Route("{sluge}")]
+        public async Task<IActionResult> GetLink(string sluge)
         {
-            if (string.IsNullOrWhiteSpace(sluge))
-                return "empty";
+            var query = new GetLinkQuery(sluge);
 
-            return sluge;
+            var result = await  _mediator.Send(query);
+
+            return result != null ? Ok(result) : NotFound();
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CreateLink([FromBody]CreateLinkCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return result != null ? Ok(result) : BadRequest();
         }
     }
 }
