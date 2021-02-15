@@ -6,13 +6,20 @@ namespace LinkShortener.Infrastructure
 {
     public class Repository : IRepository
     {
-        public static ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-        
+        //public static ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+
+        private readonly ConnectionMultiplexer _redis;
+
+        public Repository(ConnectionMultiplexer redis)
+        {
+            _redis = redis;
+        }
+
         public string GetKey(string key)
         {
             try
             {
-                var db = redis.GetDatabase();
+                var db = _redis.GetDatabase();
                 var result = db.StringGet(key);
                 return result;
             }
@@ -25,7 +32,7 @@ namespace LinkShortener.Infrastructure
 
         public bool SetKey(string key,string value)
         {
-            var db = redis.GetDatabase();
+            var db = _redis.GetDatabase();
             return db.StringSet(key, value);
         }
     }

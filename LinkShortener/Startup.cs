@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 namespace LinkShortener
 {
@@ -40,7 +41,12 @@ namespace LinkShortener
             
             //custom
             
-            services.AddSingleton<IRepository,Repository>();
+            //services.AddSingleton<IRepository,Repository>();
+            
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            var connection = ConnectionMultiplexer.Connect(connectionString);
+            services.AddScoped<IRepository>(x => new Repository(connection));
+            
             
             //CQRS Pattern + Mediator Pattern https://www.youtube.com/watch?v=YzOBrVlthMk&feature=youtu.be
             services.AddMediatR(typeof(Startup));            
