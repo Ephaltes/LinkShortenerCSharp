@@ -12,15 +12,11 @@ namespace LinkShortener.Controllers
     [Route("api/[controller]")]
     public class LinkController : ControllerBase
     {
-        private readonly ILogger<LinkController> _logger;
-        private readonly IRepository _db;
         private readonly IMediator _mediator;
 
         public LinkController(ILogger<LinkController> logger, IMediator mediator, IRepository db)
         {
-            _logger = logger;
             _mediator = mediator;
-            _db = db;
         }
 
         [HttpGet]

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using LinkShortener.Application.Command;
 using LinkShortener.Application.Interface;
@@ -17,13 +18,20 @@ namespace LinkShortener.Application.Handlers
 
         public async Task<string> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
         {
-            if (request == null)
-                return null;
-
-            if (string.IsNullOrWhiteSpace(request.Link))
-                return null;
-
-            return request.Sluge;
+            while (true)
+            {
+                if (!String.IsNullOrWhiteSpace(request.Sluge) && IsSlugAvailable(request.Sluge))
+                {
+                    _db.SetKey(request.Sluge, request.Link);
+                    return request.Sluge;
+                }
+                request.CreateSluge();
+            }
+        }
+        
+        protected bool IsSlugAvailable(string sluge)
+        {
+            return String.IsNullOrEmpty(_db.GetKey(sluge));
         }
     }
 }
