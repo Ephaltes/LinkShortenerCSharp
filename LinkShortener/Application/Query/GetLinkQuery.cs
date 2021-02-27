@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using LinkShortener.Application.Model;
+using MediatR;
 
 namespace LinkShortener.Application.Query
 {
-    public class GetLinkQuery : IRequest<string>
+    public class GetLinkQuery : IRequest<CustomResponse<string>>
     {
         public string Sluge { get; }
 

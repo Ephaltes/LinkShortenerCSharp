@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using LinkShortener.Api;
 using LinkShortener.Application.Command;
 using LinkShortener.Application.Interface;
 using LinkShortener.Application.Query;
+using LinkShortener.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,17 +27,16 @@ namespace LinkShortener.Controllers
         public async Task<IActionResult> GetLink(string sluge)
         {
             var query = new GetLinkQuery(sluge);
-
             var result = await  _mediator.Send(query);
-
-            return result != null ? Ok(result) : NotFound();
+            return result.ToResponse();
         }
         
         [HttpPost]
         public async Task<IActionResult> CreateLink([FromBody]CreateLinkCommand command)
         {
-            var result = await _mediator.Send(command);
-            return result != null ? Ok(result) : BadRequest();
+
+                var result = await _mediator.Send(command);
+                return result.ToResponse();
         }
     }
 }

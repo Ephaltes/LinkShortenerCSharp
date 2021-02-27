@@ -1,8 +1,10 @@
-﻿namespace LinkShortener.Application.Interface
+﻿using System.Threading.Tasks;
+
+namespace LinkShortener.Application.Interface
 {
     public interface IRepository
     {
-        public string GetKey(string key);
-        public bool SetKey(string key,string value);
+        public Task<string> GetKeyAsync(string key);
+        public Task<bool> SetKeyAsync(string key,string value);
     }
 }

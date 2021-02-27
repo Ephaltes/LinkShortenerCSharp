@@ -10,7 +10,8 @@ namespace LinkShortener.Application.Validation
         public GetLinkQueryValidator()
         {
             RuleFor(x => x.Sluge)
-                .NotEmpty();
+                .NotEmpty()
+                .WithMessage("Sluge is empty");
         }
     }
 }

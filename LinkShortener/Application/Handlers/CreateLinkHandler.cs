@@ -3,11 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using LinkShortener.Application.Command;
 using LinkShortener.Application.Interface;
+using LinkShortener.Application.Model;
 using MediatR;
 
 namespace LinkShortener.Application.Handlers
 {
-    public class CreateLinkHandler : IRequestHandler<CreateLinkCommand,string>
+    public class CreateLinkHandler : IRequestHandler<CreateLinkCommand,CustomResponse<string>>
     {
         private readonly IRepository _db;
 
@@ -16,22 +17,36 @@ namespace LinkShortener.Application.Handlers
             _db = db;
         }
 
-        public async Task<string> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<string>> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
         {
-            while (true)
+
+            if (request.CustomSluge 
+                && (String.IsNullOrWhiteSpace(request.Sluge) 
+                    ||  ! await IsSlugAvailable(request.Sluge))
+                )
+                return CustomResponse.Error<string>(400,"Slug not available");
+
+            if (!request.CustomSluge)
             {
-                if (!String.IsNullOrWhiteSpace(request.Sluge) && IsSlugAvailable(request.Sluge))
+                while (true)
                 {
-                    _db.SetKey(request.Sluge, request.Link);
-                    return request.Sluge;
+                    if (!String.IsNullOrWhiteSpace(request.Sluge) 
+                        && await IsSlugAvailable(request.Sluge))
+                    {
+                        await _db.SetKeyAsync(request.Sluge, request.Link);
+                        return CustomResponse.Success(request.Sluge);
+                    }
+                    request.CreateSluge();
                 }
-                request.CreateSluge();
             }
+
+            await _db.SetKeyAsync(request.Sluge, request.Link);
+            return CustomResponse.Success(request.Sluge);
         }
         
-        protected bool IsSlugAvailable(string sluge)
+        protected async Task<bool> IsSlugAvailable(string sluge)
         {
-            return String.IsNullOrEmpty(_db.GetKey(sluge));
+            return String.IsNullOrEmpty(await _db.GetKeyAsync(sluge));
         }
     }
 }

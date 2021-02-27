@@ -1,12 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LinkShortener.Application.Interface;
+using LinkShortener.Application.Model;
 using LinkShortener.Application.Query;
 using MediatR;
 
 namespace LinkShortener.Application.Handlers
 {
-    public class GetLinkHandler : IRequestHandler<GetLinkQuery,string>
+    public class GetLinkHandler : IRequestHandler<GetLinkQuery,CustomResponse<string>>
     {
         private readonly IRepository _db;
         
@@ -15,14 +16,14 @@ namespace LinkShortener.Application.Handlers
             _db = db;
         }
         
-        public async Task<string> Handle(GetLinkQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<string>> Handle(GetLinkQuery request, CancellationToken cancellationToken)
         {
-            var result = _db.GetKey(request.Sluge);
+            var result = await _db.GetKeyAsync(request.Sluge);
 
             if (string.IsNullOrWhiteSpace(result))
-                return null;
+                return CustomResponse.Error<string>(400,"Sluge unknown");
 
-            return result;
+            return CustomResponse.Success(result);
         }
     }
 }

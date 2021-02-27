@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LinkShortener.Application.Interface;
 using StackExchange.Redis;
 
@@ -15,12 +16,12 @@ namespace LinkShortener.Infrastructure
             _redis = redis;
         }
 
-        public string GetKey(string key)
+        public async Task<string> GetKeyAsync(string key)
         {
             try
             {
                 var db = _redis.GetDatabase();
-                var result = db.StringGet(key);
+                var result = await db.StringGetAsync(key);
                 return result;
             }
             catch (Exception e)
@@ -30,10 +31,10 @@ namespace LinkShortener.Infrastructure
             }
         }
 
-        public bool SetKey(string key,string value)
+        public async Task<bool> SetKeyAsync(string key,string value)
         {
             var db = _redis.GetDatabase();
-            return db.StringSet(key, value);
+            return await db.StringSetAsync(key, value);
         }
     }
 }

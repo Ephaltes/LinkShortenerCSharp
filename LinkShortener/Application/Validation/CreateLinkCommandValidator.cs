@@ -10,7 +10,8 @@ namespace LinkShortener.Application.Validation
         {
             RuleFor(x => x.Link)
                 .NotEmpty()
-                .Must(IsUri);
+                .Must(IsUri)
+                .WithMessage("Invalid URL");
         }
 
         private bool IsUri(string link)
