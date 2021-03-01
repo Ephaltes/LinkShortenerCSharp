@@ -17,7 +17,7 @@ namespace LinkShortener.Api
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://*:5050"); //Wenn die anwendung über die console gestartet wird sie �ber port 50 laufen sonst �ber die in hostsettings eingestellte
+                    webBuilder.UseUrls("http://*:5080"); //Port when starting through debugger
                     webBuilder.ConfigureKestrel((context, options) =>
                     {
                         options.AddServerHeader = false;
